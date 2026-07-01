@@ -9,7 +9,7 @@ app.use(express.json());
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = process.env.MONGO_DB_URI;
 
 
@@ -34,22 +34,44 @@ async function run() {
       const result = await ticketCollection.insertOne(ticket);
       res.send(result)
     })
-    // app.get('/api/tickets', async (req, res) => {
-    //   const result = await ticketCollection.find().toArray();
-    //   res.send(result)
-    // })
-    app.get('/api/tickets', async (req, res) => {
-      const query = {};
-      if (req.query.operator) {
-        query.operator = req.query.operator;
+    app.get("/api/tickets/:ticketId", async (req, res) => {
+      const { ticketId } = req.params;
+
+      if (!ObjectId.isValid(ticketId)) {
+        return res.status(400).send({
+          message: "Invalid Ticket ID",
+        });
       }
-      if (req.query.status) {
-        query.status = req.query.status;
+
+      const result = await ticketCollection.findOne({
+        _id: new ObjectId(ticketId),
+      });
+
+      if (!result) {
+        return res.status(404).send({
+          message: "Ticket not found",
+        });
       }
-      const cursor = await ticketCollection.find(query);
-      const result = await cursor.toArray();
+
       res.send(result);
-    })
+    });
+    app.get("/api/tickets", async (req, res) => {
+      const { operator, status } = req.query;
+
+      const query = {};
+
+      if (operator) {
+        query.operator = operator;
+      }
+
+      if (status) {
+        query.status = status;
+      }
+
+      const result = await ticketCollection.find(query).toArray();
+
+      res.send(result);
+    });
     // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
