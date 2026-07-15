@@ -1,10 +1,11 @@
 {
   "name": "trip-next-server",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "This is a server for the trip-next project, which is a travel planning application built with Next.js. The server handles API requests, manages database interactions, and serves as the backend for the application.",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
