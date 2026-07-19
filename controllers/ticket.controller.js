@@ -5,7 +5,20 @@ module.exports = (db) => {
 
   return {
     async createTicket(req, res) {
-      const result = await ticketCollection.insertOne(req.body);
+
+      const totalTickets = await ticketCollection.countDocuments();
+
+      const id = `TK${String(totalTickets + 1).padStart(4, "0")}`;
+      const ticketNo = `TN-2026-${String(totalTickets + 1).padStart(4, "0")}`;
+
+      const ticket = {
+        ...req.body,
+        id,
+        ticketNo,
+      };
+
+      const result = await ticketCollection.insertOne(ticket);
+      console.log(result)
       res.send(result);
     },
 
@@ -31,37 +44,69 @@ module.exports = (db) => {
     },
 
     async getAllTickets(req, res) {
-
       try {
-        const { operator, status, featured, latest, limit } = req.query;
+        const {
+          operator,
+          status,
+          featured,
+          latest,
+          limit,
+          from,
+          to,
+          transport,
+          date,
+        } = req.query;
 
         const query = {};
-        let cursor = ticketCollection.find(query);
 
-        if (operator) query.operator = operator;
-        if (status) query.status = status;
+        if (from) {
+          query.from = {
+            $regex: `^${from}$`,
+            $options: "i",
+          };
+        }
 
-        // Featured tickets (admin approved)
+        if (to) {
+          query.to = {
+            $regex: `^${to}$`,
+            $options: "i",
+          };
+        }
+
+        if (transport) {
+          query.transport = {
+            $regex: `^${transport}$`,
+            $options: "i",
+          };
+        }
+
+        if (date) {
+          query.departure = {
+            $regex: `^${date}`,
+          };
+        }
+        if (operator) { query.operator = operator }
         if (featured === "true") {
           query.isFeatured = true;
         }
 
 
-        // Latest tickets
+        let cursor = ticketCollection.find(query);
+
         if (latest === "true") {
           cursor = cursor.sort({ _id: -1 });
         }
 
-        // Limit
         if (limit) {
           cursor = cursor.limit(Number(limit));
         }
-
-        const result = await cursor.toArray();
-
+        const result = await cursor.sort({ departure: -1, price: 1 }).toArray();
         res.send(result);
       } catch (error) {
-        res.status(500).send({ message: error.message });
+        res.status(500).send({
+          success: false,
+          message: error.message,
+        });
       }
     }
   }

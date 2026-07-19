@@ -1,9 +1,12 @@
+const { ObjectId } = require("mongodb");
+
 module.exports = (db) => {
 
   const bookingCollection = db.collection("bookings");
-
+  const ticketCollection = db.collection("tickets")
   return {
     async createBooking(req, res) {
+      console.log(req.body)
       try {
         const {
           ticketId,
@@ -127,7 +130,10 @@ module.exports = (db) => {
       if (userId) {
         query.userId = userId;
       }
-      const result = await bookingCollection.find(query).toArray();
+      const result = await bookingCollection
+        .find(query)
+        .sort({ _id: -1 })
+        .toArray();
       res.send(result);
     }
   }
