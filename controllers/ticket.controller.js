@@ -10,15 +10,15 @@ module.exports = (db) => {
 
       const id = `TK${String(totalTickets + 1).padStart(4, "0")}`;
       const ticketNo = `TN-2026-${String(totalTickets + 1).padStart(4, "0")}`;
-
+      let status = "pending"
       const ticket = {
         ...req.body,
         id,
         ticketNo,
+        status
       };
 
       const result = await ticketCollection.insertOne(ticket);
-      console.log(result)
       res.send(result);
     },
 
@@ -46,6 +46,7 @@ module.exports = (db) => {
     async getAllTickets(req, res) {
       try {
         const {
+          vendorId,
           operator,
           status,
           featured,
@@ -57,7 +58,11 @@ module.exports = (db) => {
           date,
         } = req.query;
 
-        const query = {};
+        const query = {
+          status: 'available'
+        };
+
+        if (vendorId) { query.vendorId = vendorId }
 
         if (from) {
           query.from = {
@@ -85,22 +90,29 @@ module.exports = (db) => {
             $regex: `^${date}`,
           };
         }
+
         if (operator) { query.operator = operator }
+
         if (featured === "true") {
           query.isFeatured = true;
         }
 
 
         let cursor = ticketCollection.find(query);
-
+        let sortOption = {};
         if (latest === "true") {
-          cursor = cursor.sort({ _id: -1 });
+          sortOption = { id: -1 };
+        } else {
+          sortOption = {
+            departure: -1,
+            price: 1,
+          };
         }
 
         if (limit) {
           cursor = cursor.limit(Number(limit));
         }
-        const result = await cursor.sort({ departure: -1, price: 1 }).toArray();
+        const result = await cursor.sort(sortOption).toArray();
         res.send(result);
       } catch (error) {
         res.status(500).send({
