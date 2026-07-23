@@ -11,11 +11,13 @@ module.exports = (db) => {
       const id = `TK${String(totalTickets + 1).padStart(4, "0")}`;
       const ticketNo = `TN-2026-${String(totalTickets + 1).padStart(4, "0")}`;
       let status = "pending"
+      let featured = false;
       const ticket = {
         ...req.body,
         id,
         ticketNo,
-        status
+        status,
+        featured
       };
 
       const result = await ticketCollection.insertOne(ticket);
@@ -58,9 +60,11 @@ module.exports = (db) => {
           date,
         } = req.query;
 
-        const query = {
-          status: 'available'
-        };
+        const query = {};
+
+        if (status !== "all") {
+          query.status = status ?? "available";
+        }
 
         if (vendorId) { query.vendorId = vendorId }
 
@@ -94,17 +98,19 @@ module.exports = (db) => {
         if (operator) { query.operator = operator }
 
         if (featured === "true") {
-          query.isFeatured = true;
+          query.featured = true;
         }
 
 
         let cursor = ticketCollection.find(query);
+
         let sortOption = {};
+
         if (latest === "true") {
-          sortOption = { id: -1 };
+          sortOption = { _id: -1 };
         } else {
           sortOption = {
-            departure: -1,
+            departure: 1,
             price: 1,
           };
         }

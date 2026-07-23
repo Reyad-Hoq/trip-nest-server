@@ -7,6 +7,7 @@ const connectDB = require("./config/db");
 
 const ticketRoutes = require("./routes/ticket.routes");
 const bookingRoutes = require("./routes/booking.routes");
+const userRoutes = require("./routes/user.routes");
 
 const app = express();
 
@@ -21,6 +22,7 @@ async function startServer() {
 
     app.use('/api/tickets', ticketRoutes(db));
     app.use('/api/bookings', bookingRoutes(db));
+    app.use('/api/users', userRoutes(db))
 
     app.get("/", (req, res) => {
       res.send("Welcome to the TripNest API!");
