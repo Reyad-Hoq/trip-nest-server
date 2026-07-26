@@ -62,8 +62,8 @@ module.exports = (db) => {
 
         const query = {};
 
-        if (status !== "all") {
-          query.status = status ?? "available";
+        if (status && status !== "all") {
+          query.status = status;
         }
 
         if (vendorId) { query.vendorId = vendorId }
@@ -124,6 +124,29 @@ module.exports = (db) => {
         res.status(500).send({
           success: false,
           message: error.message,
+        });
+      }
+    },
+    async updateTicket(req, res) {
+      try {
+        const { ticketId } = req.params;
+
+        console.log("Params:", req.params);
+        console.log("Body:", req.body);
+
+        const result = await ticketCollection.updateOne({ _id: new ObjectId(ticketId) },
+          {
+            $set: req.body,
+          });
+
+        res.send(result)
+        console.log(result)
+      } catch (err) {
+        console.log(err);
+
+        res.status(500).send({
+          success: false,
+          message: err.message,
         });
       }
     }

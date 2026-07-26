@@ -12,5 +12,7 @@ module.exports = (db) => {
 
   router.post("/", ticketController.createTicket)
 
+  router.patch("/:ticketId", ticketController.updateTicket)
+
   return router;
 };
