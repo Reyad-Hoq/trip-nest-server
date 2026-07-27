@@ -9,6 +9,6 @@ module.exports = (db) => {
   const userController = createUserController(db);
 
   router.get('/', userController.getUsers)
-
+  router.patch('/:userId', userController.updateUser)
   return router;
 }
