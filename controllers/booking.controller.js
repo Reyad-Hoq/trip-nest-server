@@ -88,8 +88,8 @@ module.exports = (db) => {
           userName,
           userEmail,
 
-          status: "Pending",
-          paymentStatus: "Unpaid",
+          status: "pending",
+          paymentStatus: "unpaid",
 
           bookedAt: new Date(),
         };
