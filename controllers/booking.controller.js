@@ -6,7 +6,6 @@ module.exports = (db) => {
   const ticketCollection = db.collection("tickets")
   return {
     async createBooking(req, res) {
-      console.log(req.body)
       try {
         const {
           ticketId,
@@ -124,17 +123,63 @@ module.exports = (db) => {
       }
     },
     async getBookings(req, res) {
-      const { userId } = req.query;
+      try {
+        const { userId, vendorId, status } = req.query;
 
-      const query = {};
-      if (userId) {
-        query.userId = userId;
+        const query = {};
+
+        if (userId) {
+          query.userId = userId;
+        }
+
+        if (vendorId) {
+          query.vendorId = vendorId;
+        }
+
+        if (status && status !== "all") {
+          query.status = status;
+        }
+
+        const result = await bookingCollection
+          .find(query)
+          .sort({ _id: -1 })
+          .toArray();
+        res.send(result);
+
+      } catch (err) {
+        res.status(500).send({
+          success: false,
+          message: err.message,
+        });
       }
-      const result = await bookingCollection
-        .find(query)
-        .sort({ _id: -1 })
-        .toArray();
-      res.send(result);
+    },
+    async updateBooking(req, res) {
+      try {
+        const { bookingId } = req.params;
+        if (!ObjectId.isValid(bookingId)) {
+          return res.status(400).send({
+            success: false,
+            message: "Invalid Booking ID",
+          });
+        }
+
+        const result = await bookingCollection.updateOne(
+          { _id: new ObjectId(bookingId) },
+          {
+            $set: req.body,
+          }
+        );
+
+        res.send({
+          success: true,
+          message: "Booking updated successfully",
+        });
+      } catch (err) {
+        res.status(500).send({
+          success: false,
+          message: err.message,
+        });
+      }
     }
   }
 }

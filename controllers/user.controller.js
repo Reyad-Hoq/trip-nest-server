@@ -15,16 +15,12 @@ module.exports = (db) => {
       try {
         const { userId } = req.params;
 
-        console.log("Params:", req.params);
-        console.log("Body:", req.body);
-
         const result = await userCollection.updateOne({ _id: new ObjectId(userId) },
           {
             $set: req.body,
           });
 
         res.send(result)
-        console.log(result)
       } catch (err) {
         console.log(err);
 

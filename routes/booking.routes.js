@@ -11,6 +11,7 @@ module.exports = (db) => {
   router.post("/", bookingController.createBooking);
 
   router.get("/", bookingController.getBookings);
+  router.patch("/:bookingId", bookingController.updateBooking);
 
   return router;
 

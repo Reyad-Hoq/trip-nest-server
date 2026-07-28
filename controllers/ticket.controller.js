@@ -170,7 +170,6 @@ module.exports = (db) => {
           });
 
         res.send(result)
-        console.log(result)
       } catch (err) {
         console.log(err);
 
