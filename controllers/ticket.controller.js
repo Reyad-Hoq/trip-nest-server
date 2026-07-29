@@ -55,21 +55,23 @@ module.exports = (db) => {
     },
 
     async getAllTickets(req, res) {
-
-
       try {
         const {
+          page = 1,
+          limit = 9,
           vendorId,
           operator,
           status,
           featured,
           latest,
-          limit,
           from,
           to,
           transport,
           date,
         } = req.query;
+
+        const pageNum = Math.max(1, parseInt(page) || 1);
+        const limitNum = Math.max(1, parseInt(limit) || 9);
 
         const query = {};
 
@@ -148,11 +150,20 @@ module.exports = (db) => {
           };
         }
 
-        if (limit) {
-          cursor = cursor.limit(Number(limit));
-        }
-        const result = await cursor.sort(sortOption).toArray();
-        res.send(result);
+        const total = await ticketCollection.countDocuments(query);
+
+        const result = await cursor
+          .sort(sortOption)
+          .skip((pageNum - 1) * limitNum)
+          .limit(limitNum)
+          .toArray();
+
+        res.send({
+          tickets: result,
+          total,
+          currentPage: pageNum,
+          totalPages: Math.ceil(total / limitNum) || 1,
+        });
       } catch (error) {
         res.status(500).send({
           success: false,
