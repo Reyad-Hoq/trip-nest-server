@@ -26,7 +26,9 @@ module.exports = (db) => {
         id,
         ticketNo,
         status,
-        featured
+        featured,
+        price: Number(req.body.price),
+        availableSeats: Number(req.body.availableSeats)
       };
 
       const result = await ticketCollection.insertOne(ticket);
@@ -136,7 +138,9 @@ module.exports = (db) => {
           query.featured = true;
         }
 
-
+        // if (featured && featured !== "all") {
+        //   query.featured = featured;
+        // }
         let cursor = ticketCollection.find(query);
 
         let sortOption = {};
