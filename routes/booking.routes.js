@@ -1,8 +1,9 @@
 const express = require("express");
 
-const createBookingController = require("../controllers/booking.controller")
+const createBookingController = require("../controllers/booking.controller");
+const verifyUser = require("../middleware/verifyUser");
 
-module.exports = (db) => {
+module.exports = (db, verifyToken) => {
 
   const router = express.Router();
 
@@ -10,8 +11,8 @@ module.exports = (db) => {
 
   router.post("/", bookingController.createBooking);
 
-  router.get("/", bookingController.getBookings);
-  router.patch("/:bookingId", bookingController.updateBooking);
+  router.get("/", verifyToken, verifyUser, bookingController.getBookings);
+  router.patch("/:bookingId", verifyToken, bookingController.updateBooking);
 
   return router;
 
