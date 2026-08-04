@@ -229,7 +229,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
-  console.log('params', req.params)
+  
   res.send('Hello World! This is Tripnest server running on port 8000')
 })
 

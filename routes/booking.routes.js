@@ -11,8 +11,8 @@ module.exports = (db, verifyToken) => {
 
   router.post("/", bookingController.createBooking);
 
-  router.get("/", verifyToken, verifyUser, bookingController.getBookings);
-  router.patch("/:bookingId", verifyToken, bookingController.updateBooking);
+  router.get("/", verifyToken, verifyUser('user', 'vendor'), bookingController.getBookings);
+  router.patch("/:bookingId", verifyToken, verifyUser('vendor'), bookingController.updateBooking);
 
   return router;
 

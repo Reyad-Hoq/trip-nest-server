@@ -30,8 +30,7 @@ module.exports = async (req, res, next) => {
       });
     }
     const userId = session.userId;
-    console.log(userId);
-
+   
     const userQuery = { _id: userId };
     const user = await userCollection.findOne(userQuery);
     if (!user) {

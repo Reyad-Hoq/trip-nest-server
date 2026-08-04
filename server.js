@@ -8,6 +8,7 @@ const connectDB = require("./config/db");
 const ticketRoutes = require("./routes/ticket.routes");
 const bookingRoutes = require("./routes/booking.routes");
 const userRoutes = require("./routes/user.routes");
+const paymentRoutes = require("./routes/payment.route");
 
 const verifyToken = require("./middleware/verifyToken");
 
@@ -25,7 +26,8 @@ async function startServer() {
     app.use('/api/tickets', ticketRoutes(db, verifyToken));
     app.use('/api/bookings', bookingRoutes(db, verifyToken));
     app.use('/api/users', userRoutes(db, verifyToken));
-
+    app.use('/api/payments', paymentRoutes(db, verifyToken));
+    
     app.get("/", (req, res) => {
       res.send("Welcome to the TripNest API!");
     });
